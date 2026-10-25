@@ -78,6 +78,8 @@ class Ledger:
         if tools:
             kwargs["tools"] = tools
             kwargs["reasoning_effort"] = "none"  # gpt-6-luna on chat/completions only allows tools without reasoning
+        elif config.REASONING_EFFORT != "default":
+            kwargs["reasoning_effort"] = config.REASONING_EFFORT
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
         start = time.perf_counter()

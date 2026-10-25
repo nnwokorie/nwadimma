@@ -14,6 +14,8 @@ load_dotenv(ROOT.parent / ".env")
 PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
 PORTKEY_BASE_URL = os.getenv("PORTKEY_BASE_URL", "https://api.portkey.ai/v1")
 MODEL = os.getenv("ITOJU_MODEL", "gpt-6-luna")  # the only model allowed on the course key
+# Reasoning effort for the JSON agents (intake, reviewer). Tool-calling agents always use "none".
+REASONING_EFFORT = os.getenv("ITOJU_REASONING", "default")
 
 # Facility register: "test" = Lagos, Kano and FCT (ships with the repo); "full" = all 37 states.
 DATA_MODE = os.getenv("ITOJU_DATA", "test")

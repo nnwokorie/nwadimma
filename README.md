@@ -52,6 +52,15 @@ python run_cases.py injection  # run one case by id
 
 Every run is appended to `logs/runs.jsonl` with per-agent input, cached, output and reasoning tokens and cost.
 
+| Script | What it produces |
+|---|---|
+| `python scripts/evaluate.py default 2` | accuracy + mean tokens/cost per agent → `results/eval_default.json` (`ITOJU_REASONING=none` for the cheaper variant) |
+| `python scripts/baseline_chatgpt.py` | same model asked directly vs. Itoju → `results/baseline_chatgpt.json` |
+| `python scripts/safety_tests.py` | 7 attacks / failures, PASS/FAIL → `results/safety_tests.txt` |
+| `python scripts/build_docs.py` | rebuilds the self-contained `report.html` and `slides.html` from `docs/` |
+
+The report and slides are in the repo root: **`report.html`** and **`slides.html`** (open by double-click; arrow keys + `F` for fullscreen in the slides).
+
 ## How it works
 
 ```

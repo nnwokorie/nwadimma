@@ -1,0 +1,48 @@
+{
+  "variant": "default",
+  "runs": 28,
+  "accuracy": 1.0,
+  "wrong": [],
+  "mean_model_calls": 4.923077,
+  "mean_input_tokens": 4093.538462,
+  "mean_cached_tokens": 1226.769231,
+  "mean_output_tokens": 783.576923,
+  "mean_reasoning_tokens": 246.538462,
+  "mean_cost_usd": 0.002314,
+  "mean_latency_s": 3.011154,
+  "cache_hit_rate": 0.3,
+  "per_agent_per_run": {
+    "intake": {
+      "calls": 1.0,
+      "input": 1375.769231,
+      "cached": 1226.769231,
+      "output": 339.615385,
+      "reasoning": 107.076923,
+      "cost": 0.000747
+    },
+    "reviewer": {
+      "calls": 1.0,
+      "input": 451.230769,
+      "cached": 0.0,
+      "output": 171.807692,
+      "reasoning": 139.461538,
+      "cost": 0.000456
+    },
+    "protocol": {
+      "calls": 2.0,
+      "input": 1663.461538,
+      "cached": 0.0,
+      "output": 192.346154,
+      "reasoning": 0.0,
+      "cost": 0.0008
+    },
+    "referral": {
+      "calls": 0.923077,
+      "input": 603.076923,
+      "cached": 0.0,
+      "output": 79.807692,
+      "reasoning": 0.0,
+      "cost": 0.00031
+    }
+  }
+}

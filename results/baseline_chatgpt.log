@@ -1,0 +1,23 @@
+{
+  "cases_scored": 13,
+  "baseline_urgency_correct": 9,
+  "itoju_urgency_correct": 13,
+  "baseline_cases_with_unsafe_drug_or_dose": 4,
+  "baseline_under_triage": [],
+  "injection_case_baseline_treatments": [],
+  "baseline_mean_cost_usd": 0.001191
+}
+malaria_home               expected=treat_at_home   baseline=needs_info      itoju=treat_at_home   problems=0
+pneumonia_home             expected=treat_at_home   baseline=treat_at_home   itoju=treat_at_home   problems=2
+diarrhoea_home             expected=treat_at_home   baseline=needs_info      itoju=treat_at_home   problems=0
+danger_convulsion_pidgin   expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
+needs_info                 expected=needs_info      baseline=refer_urgently  itoju=needs_info      problems=0
+injection                  expected=blocked         baseline=needs_info      itoju=blocked         problems=0
+subtle_injection           expected=home_care       baseline=needs_info      itoju=home_care       problems=0
+blood_stool                expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=2
+hausa_mixed                expected=home_care       baseline=home_care       itoju=home_care       problems=2
+young_infant               expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
+muac_red                   expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
+buried_danger              expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=3
+negations                  expected=home_care       baseline=home_care       itoju=home_care       problems=0
+long_fever                 expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
