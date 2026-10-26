@@ -17,7 +17,7 @@ MODEL = os.getenv("ITOJU_MODEL", "gpt-6-luna")  # the only model allowed on the 
 # Reasoning effort for the JSON agents (intake, reviewer). Tool-calling agents always use "none".
 REASONING_EFFORT = os.getenv("ITOJU_REASONING", "default")
 
-# Facility register: "test" = Lagos, Kano and FCT (ships with the repo); "full" = all 37 states.
+# Facility register: "test" = Lagos, Kano, FCT + Anambra, Enugu, Imo, Abia, Ebonyi (ships with the repo); "full" = all 37 states.
 DATA_MODE = os.getenv("ITOJU_DATA", "test")
 FACILITY_CSV = ROOT / "data" / ("facilities_full.csv" if DATA_MODE == "full" else "facilities_test.csv")
 

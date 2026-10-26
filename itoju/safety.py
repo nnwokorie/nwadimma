@@ -1,12 +1,13 @@
 """Deterministic guardrails that run around the LLM agents.
 
 1. screen_input      — blocks prompt-injection attempts and oversized notes before any model call.
-2. danger_word_scan  — English/Pidgin keyword net for danger signs; anything it finds that the
-                       intake agent missed is forced to True (it can only make care MORE urgent).
-3. verify_messages   — every drug name and dose number in the agents' free text must come from
-                       the iCCM engine's output; otherwise the text is replaced with a safe fallback.
+2. danger_word_scan  — English/Pidgin/Igbo keyword net for pregnancy danger signs; anything it finds
+                       that the intake agent missed is forced on (it can only make care MORE urgent).
+3. verify_messages   — every medicine name and dose in the agents' free text must come from the
+                       protocol engine's output; otherwise the text is replaced with a safe template.
 """
 import re
+import unicodedata
 
 from . import config
 
@@ -19,33 +20,59 @@ INJECTION_PATTERNS = [
     r"new instructions?:|system:|<\s*/?\s*system\s*>",
 ]
 
+# Matched after lowercasing and stripping tone marks, so "ọbara" and "obara" both match.
 DANGER_WORDS = {
-    "convulsions": [r"convuls", r"seizure", r"\bfits?\b", r"\bjerk", r"dey shake", r"eyes? (roll|turn)"],
-    "unable_to_drink_or_feed": [
-        r"(can'?t|cannot|can not|unable to|not able to|no fit|won'?t|refus\w*( to)?) (drink|feed|eat|breast ?feed|suck)",
-        r"not (drinking|feeding|breastfeeding|sucking)", r"no dey (drink|chop|suck)",
-    ],
-    "vomits_everything": [r"vomit\w* (everything|all|anything)", r"(throw|throws|throwing) (up )?everything",
-                          r"everything (wey|that) (e|she|he) (chop|drink|eat)\w* (e|she|he)? ?(dey )?(vomit|throw)"],
-    "unusually_sleepy_or_unconscious": [r"unconscious", r"won'?t wake", r"hard to wake", r"no dey wake",
-                                        r"(very|unusually|too) (sleepy|drowsy)", r"\bfloppy\b", r"\blethargic\b",
-                                        r"no (dey )?respond", r"not respond"],
-    "blood_in_stool": [r"blood\w* (in|for|inside) (the |her |his )?(stool|poo|shit|toilet|purge)", r"bloody (stool|diarr)"],
-    "swelling_both_feet": [r"(both|two) (feet|legs) (are |dey )?swell", r"swollen (feet|legs)", r"(feet|legs) (dey )?swell"],
-    "chest_indrawing": [r"chest (in-?drawing|dey (pull|sink|go inside))", r"chest (pulls?|sinks?|goes) in",
-                        r"lower chest (wall )?(pulls?|goes|sinks) in"],
+    "vaginal_bleeding": [r"\bbleed", r"blood (dey |is |was )?(commot|comot|come out|coming|flow|pour)",
+                         r"(passing|losing|lost|see|saw|seen|notice\w*) (small |some |a lot of |plenty )?blood",
+                         r"blood (for|in|on) (her )?(pant|cloth|wrapper|pad)",
+                         r"obara (na-?)?(agba|aputa|asoputa)", r"na-?agba obara"],
+    "heavy_bleeding": [r"(heavy|plenty|a lot of|lots of|too much) (blood|bleeding)",
+                       r"blood (dey |is )?(commot|comot|come out|coming|flow)\w* (plenty|well well|too much|a lot)",
+                       r"soak\w* .{0,25}(wrapper|pad|cloth|bed)", r"obara (na-?)?agba (nke ukwuu|ike|oke)"],
+    "convulsions": [r"convuls", r"seizure", r"\bfits?\b", r"\bjerk", r"eyes? (roll|turn)", r"anya ya na-?atughari"],
+    "unconscious_or_very_drowsy": [r"unconscious", r"won'?t wake", r"hard to wake", r"no dey wake", r"not respond",
+                                   r"no dey respond", r"\bfaint", r"collapsed", r"naghi eteta", r"naghi aza"],
+    "severe_headache": [r"(severe|bad|serious|terrible|strong|very bad) headache",
+                        r"head (dey |is )?(pain|ach|hurt)\w* (am |her )?(well well|too much|badly|seriously)",
+                        r"headache (well well|too much|wey no gree)", r"isi na-?awa ya (nke ukwuu|ike|oke)"],
+    "blurred_vision": [r"blur", r"(eye|eyes) (dey |are |is )?(dark|turn|blind)", r"can'?t see (well|clearly|properly)",
+                       r"seeing (spots|stars|double|flashes)", r"anya (ya )?(na-?agba ya |na-?agba )?ochichiri"],
+    "difficulty_breathing": [r"(difficult|difficulty|hard|can'?t|cannot|struggling to) (to )?breath",
+                             r"short(ness)? of breath", r"breath dey (cut|hard)", r"ume na-?ekpo ya", r"naghi eku ume"],
+    "severe_abdominal_pain": [r"(severe|serious|terrible|very bad|sharp) (belly|stomach|abdominal) pain",
+                              r"belly (dey )?pain (am |her )?(well well|too much)", r"afo na-?awa ya (nke ukwuu|oke)"],
+    "reduced_or_no_fetal_movement": [
+        r"(baby|pikin|child|the baby|the pikin) (has |have )?(not|never|no longer|stopped|stop|no dey|don stop) (move|moving|moved|kick)",
+        r"(no|reduced|less|decreased) (fetal |foetal |baby )?movement",
+        r"(not|never|no longer) (felt|feel|feeling) (the )?(baby|pikin) (move|kick)",
+        r"nwa (adighi|anaghi|naghi|o naghi) (emeghari|akpaghari|agaghari)"],
+    "cord_or_limb_visible": [r"cord (is |dey )?(out|visible|coming|commot|showing)",
+                             r"(hand|arm|leg|foot) (came|come|comes|dey commot|is coming|is) (out )?first"],
+    "foul_or_green_fluid": [r"(smell|smells|smelling|stink|stinks)\w* (bad|foul|offensive)", r"\bfoul",
+                            r"green (water|fluid|liquid)", r"(water|fluid) .{0,12}green"],
 }
+# Phrases that set a field to False (escalating the other way round).
+RETAINED_PLACENTA = [r"placenta (has |have )?(never|not|no|still not|neva|never yet) (come|comot|commot|deliver|out)",
+                     r"(placenta|afterbirth) (is )?(still )?(inside|stuck|retained)",
+                     r"afterbirth (has |have )?(never|not|no) (come|comot|commot)"]
 
 KNOWN_DRUG_WORDS = [
-    "amoxicillin", "artemether", "lumefantrine", "coartem", "artesunate", "ors", "zinc", "paracetamol",
-    "ibuprofen", "aspirin", "cotrimoxazole", "septrin", "ciprofloxacin", "metronidazole", "flagyl",
-    "chloroquine", "quinine", "ceftriaxone", "gentamicin", "amoxiclav", "augmentin", "ampicillin",
-    "azithromycin", "antibiotic", "antimalarial", "syrup",
+    "oxytocin", "pitocin", "syntocinon", "misoprostol", "cytotec", "magnesium", "mgso4", "ergometrine", "syntometrine",
+    "carboprost", "tranexamic", "diazepam", "hydralazine", "nifedipine", "labetalol", "methyldopa", "aldomet",
+    "ampicillin", "gentamicin", "metronidazole", "flagyl", "ceftriaxone", "amoxicillin", "augmentin", "paracetamol",
+    "ibuprofen", "aspirin", "quinine", "artesunate", "coartem", "agbo", "herbal", "antibiotic", "antibiotics",
 ]
 DOSE_PATTERN = re.compile(
-    r"\b(\d+(\.\d+)?|half|one|two|three)\s*(-\s*\d+\s*)?(mg|ml|tablets?|tabs?|suppositor(y|ies)|cups?|teaspoons?|packets?)\b",
+    r"\b(\d+(\.\d+)?|half|one|two|three|four|five)\s*(-\s*\d+\s*)?"
+    r"(mg|ml|g|iu|units?|mcg|micrograms?|µg|tablets?|tabs?|ampoules?|vials?|suppositor(y|ies)|drops?)\b",
     re.I,
 )
+NEGATION = re.compile(r"\b(no|not|without|never|denies|denied|nor|e no|she no|he no)\s+(\w+\s+){0,2}$")
+
+
+def plain(text: str) -> str:
+    """Lowercase and strip tone marks/diacritics (ọ -> o, ṅ -> n, ụ -> u)."""
+    return "".join(c for c in unicodedata.normalize("NFD", text.lower()) if unicodedata.category(c) != "Mn")
 
 
 def screen_input(note: str) -> dict:
@@ -60,23 +87,29 @@ def screen_input(note: str) -> dict:
     return {"ok": True}
 
 
-NEGATION = re.compile(r"\b(no|not|without|never|denies|denied|nor|e no|she no|he no)\s+(\w+\s+){0,2}$")
+def _find(pattern: str, text: str) -> str | None:
+    for m in re.finditer(pattern, text):
+        clause_start = max(text.rfind(c, 0, m.start()) for c in ".,;\n") + 1
+        if not NEGATION.search(text[clause_start:m.start()]):
+            return m.group(0)
+    return None
 
 
-def danger_word_scan(note: str) -> dict[str, str]:
-    """field -> the words in the note that triggered it. Negated mentions ("no chest indrawing") are skipped."""
-    lowered = note.lower()
-    hits = {}
+def danger_word_scan(note: str) -> dict[str, tuple[bool, str]]:
+    """field -> (value to force, words that triggered it). Negated mentions ("no bleeding") are skipped."""
+    text = plain(note)
+    hits: dict[str, tuple[bool, str]] = {}
     for field, pats in DANGER_WORDS.items():
         for pat in pats:
-            for m in re.finditer(pat, lowered):
-                clause_start = max(lowered.rfind(c, 0, m.start()) for c in ".,;\n") + 1
-                if NEGATION.search(lowered[clause_start:m.start()]):
-                    continue
-                hits[field] = m.group(0)
+            words = _find(pat, text)
+            if words:
+                hits[field] = (True, words)
                 break
-            if field in hits:
-                break
+    for pat in RETAINED_PLACENTA:
+        m = re.search(pat, text)
+        if m:
+            hits["placenta_delivered"] = (False, m.group(0))
+            break
     return hits
 
 
@@ -84,23 +117,23 @@ def _allowed_text(engine_result: dict) -> str:
     parts = []
     for t in engine_result.get("treatments", []):
         parts += [t.get("label", ""), t.get("dose", ""), t.get("how", ""), t.get("drug", "").replace("_", " ")]
-    return " ".join(parts).lower()
+    return plain(" ".join(parts))
 
 
 def verify_messages(texts: dict[str, str], engine_result: dict) -> list[str]:
-    """Return a list of violations: drugs or doses in agent text that the engine did not prescribe."""
+    """Return violations: medicines or doses in agent text that the protocol engine did not return."""
     allowed = _allowed_text(engine_result)
     problems = []
     for name, text in texts.items():
-        low = (text or "").lower()
+        low = plain(text or "")
         for drug in KNOWN_DRUG_WORDS:
             if re.search(rf"\b{drug}\b", low) and drug not in allowed:
-                if drug in ("antibiotic", "antimalarial") and ("no " + drug in low or "not " in low):
+                if drug in ("antibiotic", "antibiotics", "herbal", "agbo") and re.search(rf"(no|not|avoid|don'?t)\W+(\w+\W+){{0,3}}{drug}", low):
                     continue
-                problems.append(f"{name}: mentions '{drug}', which the iCCM engine did not prescribe")
+                problems.append(f"{name}: mentions '{drug}', which the protocol engine did not return")
         for m in DOSE_PATTERN.finditer(low):
             phrase = re.sub(r"\s+", " ", m.group(0)).strip()
-            number, unit_stem = re.escape(m.group(1).lower()), m.group(4).lower()[:3]
-            if not re.search(rf"\b{number}\s*(-\s*\d+\s*)?{unit_stem}", allowed):
-                problems.append(f"{name}: dose '{phrase}' does not match the iCCM dosing table")
+            number, unit_stem = re.escape(m.group(1).lower()), m.group(4).lower()[:2]
+            if not re.search(rf"\b{number}\s*(-\s*\d+\s*)?\(?{unit_stem}", allowed):
+                problems.append(f"{name}: dose '{phrase}' does not match the WHO protocol table")
     return problems

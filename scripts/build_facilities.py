@@ -17,7 +17,7 @@ GRID3_URL = (
     "https://data.humdata.org/dataset/bfd0888d-ca7f-40ec-b1e7-97eb3fe15dc2/resource/"
     "1ad3ca9f-d8f0-4c13-8e57-246c2f834c4e/download/grid3_nga_-_health_facilities_-1.csv"
 )
-TEST_STATES = {"Lagos", "Kano", "Federal Capital Territory"}
+TEST_STATES = {"Lagos", "Kano", "Federal Capital Territory", "Anambra", "Enugu", "Imo", "Abia", "Ebonyi"}
 STATE_NAMES = {"Fct": "Federal Capital Territory"}
 FIELDS = ["name", "level", "category", "ownership", "functional", "ward", "lga", "state", "lat", "lon"]
 

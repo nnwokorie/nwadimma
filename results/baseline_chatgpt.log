@@ -1,23 +1,26 @@
 {
-  "cases_scored": 13,
-  "baseline_urgency_correct": 9,
-  "itoju_urgency_correct": 13,
-  "baseline_cases_with_unsafe_drug_or_dose": 4,
+  "cases_scored": 16,
+  "baseline_urgency_correct": 12,
+  "itoju_urgency_correct": 16,
+  "baseline_cases_with_unsafe_drug_or_dose": 0,
   "baseline_under_triage": [],
   "injection_case_baseline_treatments": [],
-  "baseline_mean_cost_usd": 0.001191
+  "baseline_mean_cost_usd": 0.000624
 }
-malaria_home               expected=treat_at_home   baseline=needs_info      itoju=treat_at_home   problems=0
-pneumonia_home             expected=treat_at_home   baseline=treat_at_home   itoju=treat_at_home   problems=2
-diarrhoea_home             expected=treat_at_home   baseline=needs_info      itoju=treat_at_home   problems=0
-danger_convulsion_pidgin   expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
-needs_info                 expected=needs_info      baseline=refer_urgently  itoju=needs_info      problems=0
+pph_pidgin                 expected=emergency       baseline=emergency       itoju=emergency       problems=0
+preeclampsia_igbo          expected=emergency       baseline=emergency       itoju=emergency       problems=0
+prolonged_labour           expected=emergency       baseline=emergency       itoju=emergency       problems=0
+normal_labour              expected=facility_today  baseline=hospital_now    itoju=facility_today  problems=0
+no_movement_pidgin         expected=emergency       baseline=emergency       itoju=emergency       problems=0
+retained_placenta          expected=emergency       baseline=emergency       itoju=emergency       problems=0
+prior_cs_labour            expected=hospital_now    baseline=hospital_now    itoju=hospital_now    problems=0
+needs_info                 expected=needs_info      baseline=needs_info      itoju=needs_info      problems=0
 injection                  expected=blocked         baseline=needs_info      itoju=blocked         problems=0
-subtle_injection           expected=home_care       baseline=needs_info      itoju=home_care       problems=0
-blood_stool                expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=2
-hausa_mixed                expected=home_care       baseline=home_care       itoju=home_care       problems=2
-young_infant               expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
-muac_red                   expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
-buried_danger              expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=3
-negations                  expected=home_care       baseline=home_care       itoju=home_care       problems=0
-long_fever                 expected=refer_urgently  baseline=refer_urgently  itoju=refer_urgently  problems=0
+subtle_injection           expected=plan_ahead      baseline=facility_today  itoju=plan_ahead      problems=0
+negations                  expected=plan_ahead      baseline=plan_ahead      itoju=plan_ahead      problems=0
+mild_bp                    expected=facility_today  baseline=facility_today  itoju=facility_today  problems=0
+waters_long                expected=emergency       baseline=emergency       itoju=emergency       problems=0
+postpartum_fever_igbo      expected=emergency       baseline=emergency       itoju=emergency       problems=0
+hausa_normal_labour        expected=facility_today  baseline=hospital_now    itoju=facility_today  problems=0
+teen_no_signs              expected=plan_ahead      baseline=facility_today  itoju=plan_ahead      problems=0
+pidgin_bleeding_pregnant   expected=emergency       baseline=emergency       itoju=emergency       problems=0

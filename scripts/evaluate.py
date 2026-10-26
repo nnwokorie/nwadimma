@@ -19,7 +19,7 @@ cases = json.loads((ROOT / "data" / "test_cases.json").read_text(encoding="utf-8
 
 
 def one(case):
-    out = triage(case["note"], case["location"])
+    out = triage(case["note"], case["location"], case.get("stage", ""))
     got = out.get("engine", {}).get("urgency") if out["status"] == "ok" else out["status"]
     return {"id": case["id"], "expected": case["expected"], "got": got, "correct": got == case["expected"],
             "totals": out["usage"]["totals"], "calls": out["usage"]["calls"],

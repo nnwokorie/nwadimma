@@ -1,0 +1,23 @@
+{
+  "source": "WHO, Pregnancy, Childbirth, Postpartum and Newborn Care: a guide for essential practice (PCPNC, 3rd ed., 2015); WHO, Managing Complications in Pregnancy and Childbirth (MCPC, 2nd ed., 2017); WHO recommendations for the prevention and treatment of postpartum haemorrhage (2012).",
+  "drugs": {
+    "magnesium_sulfate": {
+      "label": "Magnesium sulfate (MgSO4) 50% — pre-referral loading dose",
+      "dose": "10 g IM: 5 g (10 ml of 50%) deep IM in each buttock, with 1 ml of 2% lidocaine in the same syringe",
+      "how": "one time, then transfer immediately; only by a trained health worker",
+      "for": "convulsions or signs of severe pre-eclampsia"
+    },
+    "oxytocin": {
+      "label": "Oxytocin",
+      "dose": "10 IU IM",
+      "how": "one injection, then transfer immediately; only by a trained health worker",
+      "for": "heavy bleeding after birth or placenta not delivered"
+    },
+    "misoprostol": {
+      "label": "Misoprostol 200 microgram tablets",
+      "dose": "800 micrograms (4 tablets) under the tongue",
+      "how": "one time, only if oxytocin is not available and the baby is already born; then transfer immediately",
+      "for": "heavy bleeding after birth when oxytocin is not available"
+    }
+  }
+}

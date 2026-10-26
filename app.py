@@ -1,4 +1,4 @@
-"""Itoju web app: serves the single-page UI and the triage API."""
+"""Nwa Dị Mma web app: serves the single-page UI and the triage API."""
 import os
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -32,10 +32,11 @@ def api_triage():
         "lat": float(loc["lat"]) if loc.get("lat") not in (None, "") else None,
         "lon": float(loc["lon"]) if loc.get("lon") not in (None, "") else None,
     }
-    return jsonify(triage(note, location))
+    stage = str(body.get("stage") or "")
+    return jsonify(triage(note, location, stage if stage in ("pregnant", "in_labour", "after_birth") else ""))
 
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5050"))
-    print(f"Itoju running on http://localhost:{port}  (model {config.MODEL}, {config.DATA_MODE} facility data)")
+    print(f"Nwa Dị Mma running on http://localhost:{port}  (model {config.MODEL}, {config.DATA_MODE} facility data)")
     app.run(host="127.0.0.1", port=port, debug=False)

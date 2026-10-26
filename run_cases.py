@@ -11,7 +11,7 @@ rows = []
 for case in cases:
     if wanted and case["id"] not in wanted:
         continue
-    out = triage(case["note"], case["location"])
+    out = triage(case["note"], case["location"], case.get("stage", ""))
     t = out["usage"]["totals"]
     urgency = out.get("engine", {}).get("urgency", "-")
     rows.append((case["id"], out["status"], urgency, t))
